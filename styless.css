@@ -549,3 +549,37 @@ footer {
   .social-row { flex-direction: column; gap: 8px; }
   .social-link { text-align: center; }
 }
+
+/* ── GITHUB ACTIVITY ── */
+.activity-section { border-bottom: 1px solid var(--border); }
+.activity-feed {
+  padding: 16px 32px 32px;
+  display: flex; flex-direction: column;
+}
+.gh-loading {
+  font-size: 12px; color: var(--mid); letter-spacing: 1px;
+  padding: 24px 0;
+}
+.gh-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none; color: var(--ink);
+  opacity: 0; animation: up 0.4s forwards;
+  transition: padding-left 0.18s;
+}
+.gh-item:hover { padding-left: 6px; }
+.gh-item:last-child { border-bottom: none; }
+.gh-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); flex-shrink: 0;
+}
+.gh-action {
+  font-size: 14px; flex: 1; color: var(--mid);
+}
+.gh-action strong { color: var(--ink); font-weight: 600; }
+.gh-time {
+  font-size: 11px; color: var(--mid);
+  letter-spacing: 1px; text-transform: uppercase;
+  font-family: 'DM Mono', monospace; flex-shrink: 0;
+}

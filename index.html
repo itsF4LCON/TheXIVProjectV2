@@ -288,6 +288,18 @@
 </div>
 </section>
 
+<!-- GITHUB ACTIVITY -->
+<section class="activity-section extra-page" id="activity">
+  <div class="section-header reveal">
+    <h2 class="section-title">Activity</h2>
+    <p><strong>LATEST ON GITHUB</strong></p>
+    <a href="https://github.com/itsF4LCON" class="section-count" target="_blank" style="text-decoration:none;">itsF4LCON ↗</a>
+  </div>
+  <div class="activity-feed reveal" id="gh-feed">
+    <div class="gh-loading">Fetching activity...</div>
+  </div>
+</section>
+
 <!-- CONTACT -->
 <section class="contact-section" id="contact">
   <div class="section-header reveal">
@@ -318,6 +330,36 @@
 
 
 <script>
+// GitHub Activity
+const ghFeed = document.getElementById('gh-feed');
+fetch('https://api.github.com/users/itsF4LCON/events/public?per_page=8')
+  .then(r => r.json())
+  .then(events => {
+    const typeMap = {
+      PushEvent: (e) => `pushed to <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
+      CreateEvent: (e) => `created ${e.payload.ref_type} in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
+      WatchEvent: (e) => `starred <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
+      ForkEvent: (e) => `forked <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
+      IssuesEvent: (e) => `${e.payload.action} issue in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
+      PullRequestEvent: (e) => `${e.payload.action} PR in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
+      DeleteEvent: (e) => `deleted ${e.payload.ref_type} in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
+    };
+    const items = events.map((e, i) => {
+      const action = typeMap[e.type] ? typeMap[e.type](e) : `activity in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`;
+      const date = new Date(e.created_at);
+      const now = new Date();
+      const diff = Math.floor((now - date) / 1000 / 60);
+      let ago = diff < 60 ? `${diff}m ago` : diff < 1440 ? `${Math.floor(diff/60)}h ago` : `${Math.floor(diff/1440)}d ago`;
+      return `<a href="https://github.com/${e.repo.name}" target="_blank" class="gh-item" style="animation-delay:${i*60}ms">
+        <span class="gh-dot"></span>
+        <span class="gh-action">${action}</span>
+        <span class="gh-time">${ago}</span>
+      </a>`;
+    }).join('');
+    ghFeed.innerHTML = items;
+  })
+  .catch(() => { ghFeed.innerHTML = '<div class="gh-loading">Could not load activity.</div>'; });
+
 function updateClock() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2,'0');
