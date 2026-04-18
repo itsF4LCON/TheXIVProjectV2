@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — XIV Labs</title>
+<link rel="icon" type="image/png" href="XIV.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EDEAE2;
+  --ink: #1A1A18;
+  --mid: #7A7670;
+  --border: rgba(26,26,24,0.12);
+  --green: #4CAF7D;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 52px; padding: 0 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+.nav-logo {
+  font-size: 13px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink); text-decoration: none;
+}
+.nav-status {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--mid);
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  animation: ping 2s ease-in-out infinite;
+}
+@keyframes ping {
+  0%,100% { box-shadow: 0 0 0 0 rgba(76,175,125,0.5); }
+  50%      { box-shadow: 0 0 0 5px rgba(76,175,125,0); }
+}
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 52px 32px 0;
+  position: relative;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  z-index: 2;
+  animation: up 0.7s 0.05s both;
+}
+
+.error-label {
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--mid); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.error-label::after {
+  content: '';
+  display: block; width: 40px; height: 1px;
+  background: var(--border);
+}
+
+.error-code {
+  font-size: clamp(120px, 18vw, 220px);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -8px;
+  color: var(--ink);
+  opacity: 0.08;
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  user-select: none;
+  z-index: 1;
+}
+
+.error-title {
+  font-size: clamp(36px, 6vw, 80px);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -2px;
+  margin-bottom: 32px;
+}
+
+.error-desc {
+  font-size: 15px; line-height: 1.7;
+  color: var(--mid); max-width: 380px;
+  margin-bottom: 48px;
+}
+
+.error-meta {
+  display: flex; gap: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 28px;
+  align-items: center;
+}
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink);
+  text-decoration: none;
+  transition: gap 0.2s;
+}
+.back-link:hover { gap: 16px; }
+.back-arrow { font-size: 16px; }
+
+.divider {
+  width: 1px; height: 20px; background: var(--border);
+  margin: 0 32px;
+}
+
+.home-link {
+  font-size: 13px; color: var(--mid); text-decoration: none;
+  letter-spacing: 1px; text-transform: uppercase;
+  transition: color 0.2s;
+}
+.home-link:hover { color: var(--ink); }
+
+.knight {
+  position: fixed;
+  right: 0; bottom: 0;
+  width: 420px; height: auto;
+  pointer-events: none;
+  opacity: 0.9;
+  filter:
+    drop-shadow(2px 0 0 black)
+    drop-shadow(-2px 0 0 black)
+    drop-shadow(0 2px 0 black)
+    drop-shadow(0 -2px 0 black);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  animation: float 4s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+footer {
+  padding: 16px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid var(--border);
+}
+.footer-copy { font-size: 11px; letter-spacing: 1px; color: var(--mid); }
+
+@media (max-width: 768px) {
+  .knight { width: 180px; }
+  .content { padding-right: 160px; }
+  .error-code { font-size: 80px; letter-spacing: -4px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">F4LCON</a>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    Online
+  </div>
+</nav>
+
+<div class="error-code">404</div>
+
+<main>
+  <div class="content">
+    <div class="error-label">Error 404</div>
+    <h1 class="error-title">Page not<br>found.</h1>
+    <p class="error-desc">Whatever you were looking for doesn't exist here. Maybe it never did. The knight looked too.</p>
+    <div class="error-meta">
+      <a href="/" class="back-link">
+        <span class="back-arrow">←</span>
+        Back to base
+      </a>
+      <div class="divider"></div>
+      <a href="/#projects" class="home-link">Projects</a>
+    </div>
+  </div>
+</main>
+
+<img src="XIV.png" class="knight" alt="knight">
+
+<footer>
+  <span class="footer-copy">© 2026 F4LCON</span>
+</footer>
+
+</body>
+</html>
