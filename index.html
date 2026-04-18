@@ -76,7 +76,8 @@
 </div>
 </div>
 
-<img src="XIV.png" class="corner-avatar" alt="avatar">
+<img src="XIV.png" class="corner-avatar" alt="avatar" id="knightAvatar">
+<div class="knight-popup" id="knightPopup"></div>
 
 <div class="page" id="page">
 
@@ -359,6 +360,46 @@ fetch('https://api.github.com/users/itsF4LCON/events/public?per_page=8')
     ghFeed.innerHTML = items;
   })
   .catch(() => { ghFeed.innerHTML = '<div class="gh-loading">Could not load activity.</div>'; });
+
+// Knight easter egg
+const knight = document.getElementById('knightAvatar');
+const popup = document.getElementById('knightPopup');
+const messages = [
+  'still here.',
+  'always am.',
+  'they called me XIV. don\'t remember why.',
+  'used to serve. long time ago.',
+  'the flag changed. I didn\'t.',
+  'they put me on a list after that.',
+  'death list. number three.',
+  'the first two found me.',
+  'they didn\'t leave.',
+  'last contract went sideways. client didn\'t make it.',
+  'neither did the ones who sent him.',
+  'no orders now. no flag. just the shotgun.',
+  'they called it anarchy. I call it survival.',
+  'XIV was a rank once. now it\'s a warning.',
+  '...you\'ve been here a while. follow me.',
+];
+let clickCount = 0;
+let popupTimeout;
+knight.style.pointerEvents = 'auto';
+knight.style.cursor = 'pointer';
+knight.addEventListener('click', () => {
+  if (clickCount >= messages.length) return;
+  const msg = messages[clickCount];
+  popup.textContent = msg;
+  popup.classList.add('show');
+  clearTimeout(popupTimeout);
+  if (clickCount === messages.length - 1) {
+    setTimeout(() => { window.location.href = 'game.html'; }, 2000);
+  } else {
+    popupTimeout = setTimeout(() => popup.classList.remove('show'), 2000);
+  }
+  knight.style.transform = 'scale(0.92) translateY(0)';
+  setTimeout(() => knight.style.transform = '', 150);
+  clickCount++;
+});
 
 function updateClock() {
   const now = new Date();

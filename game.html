@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XIV — Chapter I</title>
+<link rel="icon" type="image/png" href="XIV.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a08;
+  --ink: #EDEAE2;
+  --mid: #6a6660;
+  --border: rgba(237,234,226,0.08);
+  --green: #4CAF7D;
+  --red: #c0392b;
+  --amber: #d4a843;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  /* overflow: hidden removed to allow page scrolling */
+}
+
+/* INTRO SCREEN */
+#intro {
+  position: fixed; inset: 0;
+  background: #000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 100;
+  gap: 0;
+}
+.intro-chapter {
+  font-size: 10px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--mid); margin-bottom: 24px;
+  opacity: 0; animation: fadeIn 1s 0.5s forwards;
+}
+.intro-title {
+  font-size: clamp(56px, 12vw, 120px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 900; letter-spacing: -4px;
+  line-height: 1; color: var(--ink);
+  opacity: 0; animation: fadeIn 1s 1s forwards;
+}
+.intro-sub {
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--mid); margin-top: 20px;
+  opacity: 0; animation: fadeIn 1s 1.5s forwards;
+}
+.intro-start {
+  margin-top: 64px;
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--red); cursor: pointer; border: none; background: none;
+  font-family: 'DM Mono', monospace;
+  opacity: 0; animation: fadeIn 1s 2.5s forwards;
+  transition: opacity 0.2s;
+}
+.intro-start:hover { opacity: 0.6; }
+
+/* GAME LAYOUT */
+#game {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100vh; /* Changed to min-height to allow expansion */
+}
+
+/* SCENE */
+.scene-header {
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.scene-location {
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--mid);
+}
+.scene-chapter {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--mid);
+}
+
+.scene-visual {
+  height: 220px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+  padding: 0 32px 24px;
+  background: var(--bg);
+}
+.scene-bg {
+  position: absolute; inset: 0;
+  opacity: 0.4;
+  transition: opacity 0.8s;
+}
+.scene-title {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 900; letter-spacing: -2px;
+  line-height: 1; position: relative; z-index: 1;
+  transition: opacity 0.4s;
+}
+
+/* TEXT AREA */
+.scene-text-wrap {
+  flex: 1;
+  /* overflow-y: auto removed to let the main body scroll */
+  padding: 32px;
+  display: flex; flex-direction: column; gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.scene-text {
+  font-size: 14px; line-height: 2;
+  color: var(--ink); font-weight: 300;
+  max-width: 620px;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.scene-text.vis { opacity: 1; }
+.scene-text em { color: var(--amber); font-style: normal; }
+.scene-text strong { color: var(--green); font-weight: 500; }
+
+/* CHOICES */
+.choices {
+  padding: 20px 32px 24px;
+  display: flex; flex-direction: column; gap: 8px;
+  min-height: 140px;
+}
+.choice-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--ink); font-family: 'DM Mono', monospace;
+  font-size: 12px; letter-spacing: 1px;
+  padding: 14px 20px; text-align: left; cursor: pointer;
+  transition: all 0.18s;
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0;
+  transform: translateY(6px);
+}
+.choice-btn.vis {
+  opacity: 1; transform: translateY(0);
+  transition: all 0.3s;
+}
+.choice-btn:hover {
+  border-color: var(--ink);
+  padding-left: 28px;
+  background: rgba(237,234,226,0.03);
+}
+.choice-num {
+  font-size: 10px; color: var(--mid); flex-shrink: 0;
+}
+
+/* STATUS BAR */
+.status-bar {
+  padding: 10px 32px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 32px; align-items: center;
+}
+.stat {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--mid);
+}
+.stat-val { color: var(--ink); }
+.stat-val.danger { color: var(--red); }
+.stat-val.ok { color: var(--green); }
+
+/* TYPEWRITER */
+.cursor {
+  display: inline-block;
+  width: 8px; height: 14px;
+  background: var(--green);
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); }
+
+@media (max-width: 768px) {
+  .scene-visual { height: 160px; }
+  .scene-text-wrap { padding: 20px; }
+  .choices { padding: 16px 20px; }
+  .scene-header { padding: 16px 20px; }
+  .status-bar { padding: 10px 20px; gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <div class="intro-chapter">Chapter I</div>
+  <div class="intro-title">XIV</div>
+  <div class="intro-sub">The Files</div>
+  <button class="intro-start" onclick="startGame()">[ press to begin ]</button>
+</div>
+
+<div id="game">
+  <div class="scene-header">
+    <div class="scene-location" id="sceneLocation">—</div>
+    <div class="scene-chapter">Chapter I &nbsp;·&nbsp; The Last Contract</div>
+  </div>
+
+  <div class="scene-visual">
+    <canvas class="scene-bg" id="sceneBg"></canvas>
+    <div class="scene-title" id="sceneTitle">—</div>
+  </div>
+
+  <div class="scene-text-wrap">
+    <div class="scene-text" id="sceneText"></div>
+  </div>
+
+  <div class="choices" id="choices"></div>
+
+  <div class="status-bar">
+    <div class="stat"> <span class="stat-val ok" id="statShell"></span></div>
+    <div class="stat"> <span class="stat-val danger"></span></div>
+    <div class="stat"> <span class="stat-val" id="statLoc"></span></div>
+    <div class="stat" id="statFlag" style="margin-left:auto; display:none;">
+      <span class="stat-val ok">⬡ fragment found</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SCENE DATA ──
+const scenes = {
+  s0: {
+    location: 'Abandoned Warehouse',
+    title: 'Eyes Open.',
+    text: `Cold floor. Concrete. The smell of rust and something burned.\n\nYou open your eyes. The ceiling is gone — blown out. Rain comes through in thin lines.\n\nYou're XIV. You know that much. The rest is fog.\n\nThe shotgun is still in your hand. <em>One shell.</em> You count it without looking. Force of habit.\n\nSomething happened here. The walls are scorched. There's a briefcase near the door, blown open, papers scattered.\n\n<strong>What do you do?</strong>`,
+    choices: [
+      { text: 'Check the briefcase.', next: 's1_briefcase' },
+      { text: 'Check yourself for injuries first.', next: 's1_injuries' },
+      { text: 'Get up and look outside.', next: 's1_outside' },
+    ]
+  },
+
+  s1_briefcase: {
+    location: 'Abandoned Warehouse',
+    title: 'The Briefcase.',
+    text: `You drag yourself to the briefcase. Most of the papers are ash. But one survives — a photo, edges burned.\n\nA man in a grey suit. Behind him, a building you don't recognize. Written on the back in red ink:\n\n<em>"Deliver XIV. Alive if possible."</em>\n\nYou don't know the man. But someone sent him to find you. And someone else knew they would.\n\nBeneath the photo — a folded map. One location circled. <strong>The docks. South gate.</strong>\n\nYou pocket both.`,
+    choices: [
+      { text: 'Head to the docks.', next: 's2_docks' },
+      { text: 'Wait. Think this through first.', next: 's2_think' },
+      { text: 'Look outside before moving.', next: 's1_outside' },
+    ],
+    flag: true
+  },
+
+  s1_injuries: {
+    location: 'Abandoned Warehouse',
+    title: 'Taking Stock.',
+    text: `You run a hand down your side. Two cracked ribs, maybe three. Nothing new.\n\nYour left shoulder took something — shrapnel or a graze. Hard to tell. Still moves.\n\nIn your jacket pocket: a burner phone, dead. A lighter. A key with no label.\n\nThe key is warm. Like someone held it recently. Not you.\n\n<em>You didn't come here alone.</em>\n\nWhoever was with you — they're gone now. Voluntary or not, you don't know.`,
+    choices: [
+      { text: 'Check the briefcase near the door.', next: 's1_briefcase' },
+      { text: 'Look outside.', next: 's1_outside' },
+      { text: 'Try to remember what happened.', next: 's1_remember' },
+    ],
+    flag: true
+  },
+
+  s1_outside: {
+    location: 'Abandoned Warehouse',
+    title: 'Outside.',
+    text: `The street is empty. Pre-dawn, no witnesses.\n\nThe warehouse sits at the edge of an industrial block — no cameras on this side, you checked that before. Before what, exactly, you're still not sure.\n\nA black car is parked sixty meters down. No plates. Engine cold.\n\nSomeone was here and left on foot. Or was carried out.\n\nAcross the street — a payphone. Old. Shouldn't work.\n\n<em>It's ringing.</em>`,
+    choices: [
+      { text: 'Answer the payphone.', next: 's2_phone' },
+      { text: 'Ignore it. Get back inside.', next: 's1_briefcase' },
+      { text: 'Check the black car first.', next: 's2_car' },
+    ]
+  },
+
+  s1_remember: {
+    location: 'Abandoned Warehouse',
+    title: 'Fragments.',
+    text: `You close your eyes. Push.\n\nFlashes. A meeting — someone handed you a file. A name. A target.\n\nThen: shouting. A double-cross. The smell of burning.\n\nAnd a face — someone you trusted. Standing over you. Then gone.\n\n<em>You don't remember the name. But you remember the eyes.</em>\n\nGrey. Calm. Like they'd done this before.\n\nThe rest is black.`,
+    choices: [
+      { text: 'Check the briefcase near the door.', next: 's1_briefcase' },
+      { text: 'Look outside.', next: 's1_outside' },
+    ],
+    flag: true
+  },
+
+  s2_docks: {
+    location: 'South Docks',
+    title: 'The Docks.',
+    text: `The south gate is padlocked. You don't use the gate.\n\nInside: shipping containers, stacked three high. A crane that hasn't moved in years. And light — a single lamp, rigged up near container row seven.\n\nSomeone's waiting.\n\nYou move along the fence line. Silent. The shell is one. You don't forget that.\n\nAs you get close, you hear a voice — low, controlled. On a phone.\n\n<em>"He'll come. He always does. It's the only thing predictable about him."</em>\n\nYou recognize the voice. It takes a second.\n\n<strong>It's the handler. The one who gave you the contract.</strong>`,
+    choices: [
+      { text: 'Step into the light. Confront them.', next: 's3_confront' },
+      { text: 'Stay hidden. Keep listening.', next: 's3_listen' },
+      { text: 'Pull back. This is a trap.', next: 's3_retreat' },
+    ]
+  },
+
+  s2_phone: {
+    location: 'Abandoned Warehouse',
+    title: 'The Call.',
+    text: `You pick up.\n\nSilence. Then breathing.\n\nA voice — synthetic, distorted:\n\n<em>"You were supposed to be dead, XIV. Twice now."</em>\n\nYou don't answer.\n\n<em>"The contract was never about the target. It was about you. Someone wants to know if you can still be controlled. You can't. That's the problem."</em>\n\nA pause.\n\n<em>"South docks. One hour. Come alone. I'll tell you who put you on the list."</em>\n\nThe line goes dead.\n\nYou stand in the rain with a dead receiver and one shell.`,
+    choices: [
+      { text: 'Go to the docks.', next: 's2_docks' },
+      { text: 'Don\'t go. Find another angle.', next: 's2_think' },
+    ],
+    flag: true
+  },
+
+  s2_car: {
+    location: 'Abandoned Warehouse',
+    title: 'The Black Car.',
+    text: `Unlocked. Intentionally.\n\nInside: clean. Too clean. No prints, no personal items. But under the passenger seat — a phone, still warm.\n\nLast call: four minutes ago. Number blocked. \n\nIn the glovebox: a manila envelope. Your name on it. Not your real name — <em>XIV.</em>\n\nInside: a single photograph. You. Taken recently — through a long lens, outside a building you don't recognize.\n\nAnd a note: <strong>"We know you survived. So did we. South docks."</strong>`,
+    choices: [
+      { text: 'Go to the docks.', next: 's2_docks' },
+      { text: 'This is bait. Think before moving.', next: 's2_think' },
+    ],
+    flag: true
+  },
+
+  s2_think: {
+    location: 'Abandoned Warehouse',
+    title: 'Thinking.',
+    text: `You sit with it.\n\nSomeone set up the contract knowing you'd take it. Knowing where you'd be. The warehouse wasn't random — it was chosen. For you.\n\nThe double-cross wasn't amateur. It was orchestrated. Which means someone with resources, with access, with <em>history</em> with you.\n\nYou've cut off most of your past. But not all of it.\n\nThere's one name that keeps surfacing in the fog.\n\n<strong>Maren.</strong>\n\nYour old handler. The one who recruited XIV unit. The one who said she burned the files when the flag changed.\n\nMaybe she didn't.`,
+    choices: [
+      { text: 'Head to the docks anyway.', next: 's2_docks' },
+      { text: 'Go to her last known address instead.', next: 's3_maren' },
+    ],
+    flag: true
+  },
+
+  s3_confront: {
+    location: 'South Docks',
+    title: 'Face to Face.',
+    text: `You step into the light.\n\nThe handler turns. No surprise on their face. They expected you.\n\n<em>"You look worse than I thought."</em>\n\nYou raise the shotgun. One shell. They know that too.\n\n<em>"You won't use it. You want answers more than you want me dead."</em>\n\nThey're right. You hate that.\n\n<em>"Sit down, XIV. I'll tell you everything. And then you'll understand why I did what I did."</em>\n\nA long silence. Rain on the containers.\n\nYou lower the gun. Just slightly.\n\n<strong>End of Chapter I.</strong>\n\n<em>The answers begin in Chapter II.</em>`,
+    choices: [
+      { text: '[ Return to Base ]', next: 'end' },
+    ]
+  },
+
+  s3_listen: {
+    location: 'South Docks',
+    title: 'Shadows.',
+    text: `You stay in the dark. Listen.\n\n<em>"...no, he doesn't know about Maren yet. Keep it that way."</em>\n\nMaren. The name hits like a fist.\n\n<em>"The list was her idea. XIV was always a loose end. Too good to use, too dangerous to leave."</em>\n\nA pause.\n\n<em>"If he finds the third file, it's over for all of us."</em>\n\nThe third file. You don't know what that means. But you'll find out.\n\nThe call ends. The handler pockets the phone and turns — scanning the dark.\n\n<strong>End of Chapter I.</strong>\n\n<em>You know more now. And that makes you more dangerous.</em>`,
+    choices: [
+      { text: '[ Return to Base ]', next: 'end' },
+    ],
+    flag: true
+  },
+
+  s3_retreat: {
+    location: 'South Docks',
+    title: 'Ghost.',
+    text: `You pull back into the dark. Old instinct.\n\nIf it looks like a trap, it is a trap. You didn't survive this long by walking into light.\n\nYou watch from the fence line. The handler waits twenty minutes. Then makes a call.\n\n<em>"He's not coming."</em>\n\nA pause. Listening.\n\n<em>"Then move to the secondary. He'll surface eventually. He always does."</em>\n\nThey leave. You note the direction.\n\nYou don't follow. Not tonight. Tonight you need to find <strong>Maren</strong> before they do.\n\n<strong>End of Chapter I.</strong>\n\n<em>You chose patience. Sometimes that's the only weapon left.</em>`,
+    choices: [
+      { text: '[ Return to Base ]', next: 'end' },
+    ]
+  },
+
+  s3_maren: {
+    location: 'Residential Block',
+    title: 'Maren.',
+    text: `Her last known: a flat above a closed pharmacy. Third floor, window facing east.\n\nThe light is on.\n\nYou take the back stairs. Old habit. The door is unlocked — that's new.\n\nInside: organised chaos. Maps on the wall. Strings connecting photographs. Dozens of names, half crossed out.\n\nAnd yours. In the centre. Not crossed out.\n\n<em>She's been tracking you. Protecting you. Or building a case against you.</em>\n\nA noise from the back room. Then her voice, quiet:\n\n<em>"I wondered when you'd find me. Close the door, XIV. We have a lot to talk about."</em>\n\n<strong>End of Chapter I.</strong>\n\n<em>Some answers were waiting for you. So was she.</em>`,
+    choices: [
+      { text: '[ Return to Base ]', next: 'end' },
+    ],
+    flag: true
+  },
+
+  end: null
+};
+
+// ── ENGINE ──
+let flagCount = 0;
+let typing = false;
+
+function startGame() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+  loadScene('s0');
+}
+
+function loadScene(id) {
+  if (id === 'end') { window.location.href = '/'; return; }
+  const scene = scenes[id];
+  if (!scene) return;
+
+  // Header
+  document.getElementById('sceneLocation').textContent = scene.location;
+  document.getElementById('statLoc').textContent = scene.location.split('—')[0].trim();
+
+  // Title
+  const titleEl = document.getElementById('sceneTitle');
+  titleEl.style.opacity = '0';
+  setTimeout(() => {
+    titleEl.textContent = scene.title;
+    titleEl.style.opacity = '1';
+    titleEl.style.transition = 'opacity 0.5s';
+  }, 200);
+
+  // Flag
+  if (scene.flag) {
+    flagCount++;
+    document.getElementById('statFlag').style.display = 'flex';
+    setTimeout(() => { document.getElementById('statFlag').style.display = 'none'; }, 3000);
+  }
+
+  // Background canvas
+  drawBg(scene.location);
+
+  // Text typewriter
+  const textEl = document.getElementById('sceneText');
+  textEl.classList.remove('vis');
+  textEl.innerHTML = '';
+  document.getElementById('choices').innerHTML = '';
+
+  setTimeout(() => {
+    typeText(textEl, scene.text, () => {
+      showChoices(scene.choices);
+    });
+  }, 400);
+}
+
+function typeText(el, text, onDone) {
+  el.classList.add('vis');
+  const lines = text.split('\n');
+  let lineIndex = 0;
+  let charIndex = 0;
+  let html = '';
+  const speed = 18;
+
+  function tick() {
+    if (lineIndex >= lines.length) {
+      el.innerHTML = parseText(text);
+      if (onDone) onDone();
+      return;
+    }
+    const line = lines[lineIndex];
+    if (charIndex < line.length) {
+      charIndex++;
+      const partial = lines.slice(0, lineIndex).join('\n') + '\n' + line.slice(0, charIndex);
+      el.innerHTML = parseText(partial) + '<span class="cursor"></span>';
+      
+      // Auto-scroll the text container itself while typing just in case
+      // Since we removed overflow-y, let's scroll the main window if needed
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+      
+      setTimeout(tick, speed);
+    } else {
+      lineIndex++;
+      charIndex = 0;
+      setTimeout(tick, line.length === 0 ? 80 : 40);
+    }
+  }
+  tick();
+}
+
+function parseText(text) {
+  return text
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/<em>(.*?)<\/em>/g, '<em>$1</em>');
+}
+
+function showChoices(choices) {
+  const container = document.getElementById('choices');
+  container.innerHTML = '';
+  
+  // Smooth scroll to bottom when choices appear
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+  choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-num">${String(i+1).padStart(2,'0')}</span> ${c.text}`;
+    btn.addEventListener('click', () => {
+      container.innerHTML = '';
+      // Scroll back to top for the new scene
+      window.scrollTo(0, 0); 
+      loadScene(c.next);
+    });
+    container.appendChild(btn);
+    setTimeout(() => btn.classList.add('vis'), i * 80 + 100);
+  });
+}
+
+// Simple canvas background per scene type
+function drawBg(location) {
+  const canvas = document.getElementById('sceneBg');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  const isDocks = location.includes('Dock');
+  const isResidential = location.includes('Residential');
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (isDocks) {
+    // Horizontal lines - water/industrial
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    grad.addColorStop(0, '#0a1a2a');
+    grad.addColorStop(1, '#0a0a08');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'rgba(76,175,125,0.15)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.height; i += 18) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(canvas.width, i);
+      ctx.stroke();
+    }
+  } else if (isResidential) {
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, '#1a0a0a');
+    grad.addColorStop(1, '#0a0a08');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Window lights
+    for (let i = 0; i < 12; i++) {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      ctx.fillStyle = `rgba(212,168,67,${Math.random() * 0.15 + 0.05})`;
+      ctx.fillRect(x, y, 8, 12);
+    }
+  } else {
+    // Warehouse - grid
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, '#0f0f0d');
+    grad.addColorStop(1, '#0a0a08');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'rgba(237,234,226,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 40) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 40) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+  }
+}
+
+window.addEventListener('resize', () => {
+  const loc = document.getElementById('sceneLocation').textContent;
+  if (loc !== '—') drawBg(loc);
+});
+</script>
+</body>
+</html>
