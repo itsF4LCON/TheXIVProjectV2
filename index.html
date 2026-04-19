@@ -352,95 +352,158 @@
 
 
 <script>
-// GitHub Activity
+// =========================
+// ALL REPOS COMMITS FEED
+// =========================
 const ghFeed = document.getElementById('gh-feed');
-fetch('https://api.github.com/users/itsF4LCON/events/public?per_page=8')
-  .then(r => r.json())
-  .then(events => {
-    const typeMap = {
-      PushEvent: (e) => `pushed to <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
-      CreateEvent: (e) => `created ${e.payload.ref_type} in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
-      WatchEvent: (e) => `starred <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
-      ForkEvent: (e) => `forked <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
-      IssuesEvent: (e) => `${e.payload.action} issue in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
-      PullRequestEvent: (e) => `${e.payload.action} PR in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
-      DeleteEvent: (e) => `deleted ${e.payload.ref_type} in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`,
-    };
-    const items = events.map((e, i) => {
-      const action = typeMap[e.type] ? typeMap[e.type](e) : `activity in <strong>${e.repo.name.replace('itsF4LCON/', '')}</strong>`;
-      const date = new Date(e.created_at);
-      const now = new Date();
-      const diff = Math.floor((now - date) / 1000 / 60);
-      let ago = diff < 60 ? `${diff}m ago` : diff < 1440 ? `${Math.floor(diff/60)}h ago` : `${Math.floor(diff/1440)}d ago`;
-      return `<a href="https://github.com/${e.repo.name}" target="_blank" class="gh-item" style="animation-delay:${i*60}ms">
-        <span class="gh-dot"></span>
-        <span class="gh-action">${action}</span>
-        <span class="gh-time">${ago}</span>
-      </a>`;
-    }).join('');
-    ghFeed.innerHTML = items;
-  })
-  .catch(() => { ghFeed.innerHTML = '<div class="gh-loading">Could not load activity.</div>'; });
+const USER = "itsF4LCON";
 
-// Knight easter egg
+fetch(`https://api.github.com/users/${USER}/repos?per_page=100&sort=updated`)
+  .then(r => r.json())
+  .then(async repos => {
+
+    // Fetch commits from top updated repos (limit to avoid rate limit)
+    const commitFetches = repos.slice(0, 10).map(repo =>
+      fetch(`https://api.github.com/repos/${USER}/${repo.name}/commits?per_page=5`)
+        .then(r => r.json())
+        .then(commits =>
+          commits.map(c => ({
+            message: c.commit.message.split('\n')[0],
+            author: c.commit.author.name,
+            avatar: c.author?.avatar_url || '',
+            date: new Date(c.commit.author.date),
+            url: c.html_url,
+            repo: repo.name
+          }))
+        )
+        .catch(() => [])
+    );
+
+    const allCommits = (await Promise.all(commitFetches))
+      .flat()
+      .sort((a, b) => b.date - a.date)
+      .slice(0, 8);
+
+    const now = new Date();
+
+    const items = allCommits.map((c, i) => {
+      const diff = Math.floor((now - c.date) / 1000 / 60);
+
+      let ago = diff < 60 
+        ? `${diff}m ago` 
+        : diff < 1440 
+          ? `${Math.floor(diff/60)}h ago` 
+          : `${Math.floor(diff/1440)}d ago`;
+
+      return `
+        <a href="${c.url}" target="_blank" class="gh-item"
+           style="animation-delay:${i * 50}ms; align-items: flex-start; padding: 12px 0; color: inherit; text-decoration: none;">
+          
+          <span class="gh-dot" style="margin-top: 6px;"></span>
+
+          <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+            
+            <span style="font-weight: 600; font-size: 1.05em; line-height: 1.4;">
+              ${c.message}
+            </span>
+
+            <span style="font-size: 0.85em; display: flex; align-items: center; gap: 6px;">
+              <img src="${c.avatar}" style="width: 16px; height: 16px; border-radius: 50%;">
+              <span style="opacity: 0.7;">
+                <strong>${c.author}</strong> in ${c.repo} • ${ago}
+              </span>
+            </span>
+
+          </div>
+        </a>
+      `;
+    });
+
+    ghFeed.innerHTML = items.join('') || '<div class="gh-loading">No commits found.</div>';
+  })
+  .catch(err => {
+    console.error(err);
+    ghFeed.innerHTML = '<div class="gh-loading">Could not load commits.</div>';
+  });
+
+
+// =========================
+// KNIGHT EASTER EGG
+// =========================
 const knight = document.getElementById('knightAvatar');
 const popup = document.getElementById('knightPopup');
+
 const messages = [
-  'still here.',
-  'always am.',
-  'they called me XIV. don\'t remember why.',
-  'used to serve. long time ago.',
-  'the flag changed. I didn\'t.',
-  'they put me on a list after that.',
-  'death list. number three.',
-  'the first two found me.',
-  'they didn\'t leave.',
+  'still here.', 'always am.', 'they called me XIV. don\'t remember why.',
+  'used to serve. long time ago.', 'the flag changed. I didn\'t.',
+  'they put me on a list after that.', 'death list. number three.',
+  'the first two found me.', 'they didn\'t leave.',
   'last contract went sideways. client didn\'t make it.',
-  'neither did the ones who sent him.',
-  'no orders now. no flag. just the shotgun.',
-  'they called it anarchy. I call it survival.',
-  'XIV was a rank once. now it\'s a warning.',
+  'neither did the ones who sent him.', 'no orders now. no flag. just the shotgun.',
+  'they called it anarchy. I call it survival.', 'XIV was a rank once. now it\'s a warning.',
   '...you\'ve been here a while. follow me.',
 ];
+
 let clickCount = 0;
 let popupTimeout;
+
 knight.style.pointerEvents = 'auto';
 knight.style.cursor = 'pointer';
+
 knight.addEventListener('click', () => {
   if (clickCount >= messages.length) return;
+
   const msg = messages[clickCount];
   popup.textContent = msg;
   popup.classList.add('show');
+
   clearTimeout(popupTimeout);
+
   if (clickCount === messages.length - 1) {
     setTimeout(() => { window.location.href = 'game.html'; }, 2000);
   } else {
     popupTimeout = setTimeout(() => popup.classList.remove('show'), 2000);
   }
-  knight.style.transform = 'scale(0.92) translateY(0)';
+
+  knight.style.transform = 'scale(0.92)';
   setTimeout(() => knight.style.transform = '', 150);
+
   clickCount++;
 });
 
+
+// =========================
+// CLOCK
+// =========================
 function updateClock() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2,'0');
   const m = String(now.getMinutes()).padStart(2,'0');
   const s = String(now.getSeconds()).padStart(2,'0');
+
   document.getElementById('clockTime').innerHTML =
     `${h}<span class="colon">:</span>${m}<span class="colon">:</span>${s}`;
- 
+
   const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
   document.getElementById('clockDate').textContent =
     `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
 }
+
 updateClock();
 setInterval(updateClock, 1000);
-// Generic reveal
+
+
+// =========================
+// OBSERVERS & UI
+// =========================
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('vis');
+  });
 }, { threshold: 0.08 });
+
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
 const menuBtn = document.getElementById('menuBtn');
@@ -452,7 +515,7 @@ menuBtn.addEventListener('click', () => {
   sideMenu.classList.toggle('open');
 });
 
-document.getElementById('page').addEventListener('click', (e) => {
+page.addEventListener('click', (e) => {
   if (sideMenu.classList.contains('open') && !menuBtn.contains(e.target)) {
     page.classList.remove('shift');
     sideMenu.classList.remove('open');
@@ -465,30 +528,34 @@ document.querySelectorAll('.side-inner a').forEach(link => {
     sideMenu.classList.remove('open');
   });
 });
-// Stat numbers
-const statObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) e.target.classList.add('vis');
-  });
-}, { threshold: 0.3 });
-document.querySelectorAll('.stat-num').forEach(el => statObs.observe(el));
 
-// Project rows stagger (per column independently)
-const projObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const d = parseInt(e.target.dataset.d || 0);
-      setTimeout(() => e.target.classList.add('vis'), d * 55);
-    }
-  });
-}, { threshold: 0.05 });
-document.querySelectorAll('.proj-item').forEach(el => projObs.observe(el));
+document.querySelectorAll('.stat-num').forEach(el => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('vis');
+    });
+  }, { threshold: 0.3 }).observe(el);
+});
 
-// Smooth scroll
+document.querySelectorAll('.proj-item').forEach(el => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        setTimeout(() => {
+          e.target.classList.add('vis');
+        }, (parseInt(e.target.dataset.d || 0)) * 55);
+      }
+    });
+  }, { threshold: 0.05 }).observe(el);
+});
+
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const t = document.querySelector(a.getAttribute('href'));
-    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+    if (t) {
+      e.preventDefault();
+      t.scrollIntoView({ behavior: 'smooth' });
+    }
   });
 });
 </script>
