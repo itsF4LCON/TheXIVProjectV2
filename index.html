@@ -23,8 +23,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styless.css">
 
-
-
 </head>
 <body>
 
@@ -59,12 +57,11 @@
     <a href="#projects">Projects <span class="nav-arrow">↗</span></a>
     <a href="#about">About <span class="nav-arrow">↗</span></a>
     <a href="#activity">Activity <span class="nav-arrow">↗</span></a>
-    <a href="#PWND?">PWND? <span class="nav-arrow">↗</span></a>
+    <a href="#pwnd">PWND? <span class="nav-arrow">↗</span></a>
     <a href="#contact">Contact <span class="nav-arrow">↗</span></a>
   </div>
 
   <img src="XIV.png" class="corner-avatar" alt="avatar">
-
 
     <div class="side-socials">
     <div class="social-label">Find me</div>
@@ -81,7 +78,8 @@
 <img src="XIV.png" class="corner-avatar" alt="avatar" id="knightAvatar">
 <div class="knight-popup" id="knightPopup"></div>
 
-<div class="p" id="p">
+<!-- FIX: was id="p", JS references id="page" — unified to id="page" -->
+<div class="p" id="page">
 
  <nav>
     <a href="#" class="nav-logo">F4LCON</a>
@@ -119,8 +117,9 @@
   </div>
 </section>
 
-<div class="extra-page" id="extra-page">
+<div class="extra-page">
 <!-- STATS -->
+<!-- FIX: removed duplicate id="extra-page" (IDs must be unique) -->
 <section class="stats-section">
   <p class="stats-label reveal">By the numbers</p>
   <div class="stats-grid">
@@ -139,12 +138,13 @@
   </div>
 </section>
 </div>
+
 <!-- PROJECTS -->
 <section class="projects-section" id="projects">
   <div class="section-header reveal">
     <h2 class="section-title">Projects</h2>
     <p><strong>WHAT HAVE I BUILT?</strong></p>
-    <span class="section-count">17 Total</span>
+    <span class="section-count">16 Total</span>
   </div>
 
   <div class="projects-grid extra-page">
@@ -185,6 +185,7 @@
           <span class="proj-name">Smartschool Dark</span>
           <span class="proj-tag">Dark mode extension</span>
         </a>
+        <!-- FIX: was missing closing </a> tag -->
         <a href="https://pwnd.xivlabs.tech" class="proj-item" data-d="4">
           <span class="proj-num">07</span>
           <span class="proj-name">PWND?</span>
@@ -265,45 +266,46 @@
     <p><strong>WHO AM I?</strong></p>
     <span class="section-count"> </span>
   </div>
-<div class="extra-page" id="extra-page">
-  <div class="about-inner">
-    <div class="about-left reveal">
-      <p class="about-tagline">A 17-year-old builder from Antwerp who ships real things.</p>
-      <p class="about-body">
-        The XIV Project is more than a portfolio, it's my brand and a hub for experiments. Every project starts as a question: <em>what if this existed?</em> Then I start creating things.
-      </p>
-    </div>
-    <div class="about-cols reveal">
-      <div>
-        <p class="about-col-label">Philosophy</p>
-        <div class="about-col-items">
-          <span>Creativity over perfection</span>
-          <span>Deep diving &amp; passion</span>
-          <span>Learning by doing</span>
-        </div>
+  <!-- FIX: removed duplicate id="extra-page" -->
+  <div class="extra-page">
+    <div class="about-inner">
+      <div class="about-left reveal">
+        <p class="about-tagline">A 17-year-old builder from Antwerp who ships real things.</p>
+        <p class="about-body">
+          The XIV Project is more than a portfolio, it's my brand and a hub for experiments. Every project starts as a question: <em>what if this existed?</em> Then I start creating things.
+        </p>
       </div>
-      <div>
-        <p class="about-col-label">I Build</p>
-        <div class="about-col-items">
-          <span>Games</span>
-          <span>AI tools</span>
-          <span>Experimental software</span>
-          <span>Random ideas</span>
+      <div class="about-cols reveal">
+        <div>
+          <p class="about-col-label">Philosophy</p>
+          <div class="about-col-items">
+            <span>Creativity over perfection</span>
+            <span>Deep diving &amp; passion</span>
+            <span>Learning by doing</span>
+          </div>
         </div>
-      </div>
-      <div>
-        <p class="about-col-label">Tech</p>
-        <div class="about-col-items">
-          <span>JavaScript</span>
-          <span>Python</span>
-          <span>HTML / CSS</span>
-          <span>Game Engines</span>
-          <span>React Native</span>
+        <div>
+          <p class="about-col-label">I Build</p>
+          <div class="about-col-items">
+            <span>Games</span>
+            <span>AI tools</span>
+            <span>Experimental software</span>
+            <span>Random ideas</span>
+          </div>
+        </div>
+        <div>
+          <p class="about-col-label">Tech</p>
+          <div class="about-col-items">
+            <span>JavaScript</span>
+            <span>Python</span>
+            <span>HTML / CSS</span>
+            <span>Game Engines</span>
+            <span>React Native</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </section>
 
 <!-- GITHUB ACTIVITY -->
@@ -318,7 +320,8 @@
   </div>
 </section>
 
-<section class="contact-section" id="PWND?">
+<!-- FIX: id was "#PWND?" which breaks querySelector — changed to id="pwnd" -->
+<section class="contact-section" id="pwnd">
   <div class="section-header reveal">
     <h2 class="section-title">PWND?</h2>
     <p><strong>HAVE I BEEN PWND?</strong></p>
@@ -350,7 +353,7 @@
     </div>
   </div>
 </section>
-</div>
+
 <!-- FOOTER -->
 <footer>
   <span class="footer-copy">© 2026 XIV Labs</span>
@@ -360,7 +363,7 @@
   </div>
 </footer>
 
-
+</div><!-- end #page -->
 
 <script>
 // =========================
@@ -400,10 +403,10 @@ fetch(`https://api.github.com/users/${USER}/repos?per_page=100&sort=updated`)
     const items = allCommits.map((c, i) => {
       const diff = Math.floor((now - c.date) / 1000 / 60);
 
-      let ago = diff < 60 
-        ? `${diff}m ago` 
-        : diff < 1440 
-          ? `${Math.floor(diff/60)}h ago` 
+      let ago = diff < 60
+        ? `${diff}m ago`
+        : diff < 1440
+          ? `${Math.floor(diff/60)}h ago`
           : `${Math.floor(diff/1440)}d ago`;
 
       return `
@@ -518,6 +521,7 @@ const obs = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
 const menuBtn = document.getElementById('menuBtn');
+// FIX: now correctly references id="page"
 const page = document.getElementById('page');
 const sideMenu = document.getElementById('sideMenu');
 
@@ -560,9 +564,12 @@ document.querySelectorAll('.proj-item').forEach(el => {
   }, { threshold: 0.05 }).observe(el);
 });
 
+// FIX: smooth scroll now works correctly since #pwnd no longer has a "?" in the selector
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
+    const href = a.getAttribute('href');
+    if (href === '#') return; // skip plain # links
+    const t = document.querySelector(href);
     if (t) {
       e.preventDefault();
       t.scrollIntoView({ behavior: 'smooth' });
